@@ -180,7 +180,7 @@ export function VehicleFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={(next) => !isSubmitting && onOpenChange(next)}>
-      <DialogContent className="max-h-[92dvh] overflow-y-auto sm:max-w-3xl">
+      <DialogContent className="dialog-mobile-sheet max-h-[92dvh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>{isEdit ? `Edit ${car.year} ${car.make} ${car.model}` : "Add a vehicle"}</DialogTitle>
           <DialogDescription>
@@ -355,7 +355,7 @@ export function VehicleFormDialog({
             </TabsContent>
           </Tabs>
 
-          <DialogFooter className="mt-6">
+          <DialogFooter className="mt-6 max-sm:sticky max-sm:bottom-0 max-sm:-mx-4 max-sm:border-t max-sm:bg-popover max-sm:px-4 max-sm:py-3">
             <Button type="button" variant="outline" className="h-9" disabled={isSubmitting} onClick={() => onOpenChange(false)}>
               {tab === "photos" ? "Done" : "Cancel"}
             </Button>

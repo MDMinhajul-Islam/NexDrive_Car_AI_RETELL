@@ -37,8 +37,8 @@ export default async function BookPage({ searchParams }: Props) {
         title="Book a test drive"
         description="Pick a vehicle and a time that suits you. A NexDrive specialist will confirm your appointment and have the car waiting."
       />
-      <div className="container-page grid gap-12 py-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:py-16">
-        <div className="rounded-2xl border bg-card p-6 sm:p-8">
+      <div className="container-page grid grid-cols-1 gap-12 py-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:py-16">
+        <div className="min-w-0 rounded-2xl border bg-card p-4 sm:p-8">
           {vehicle && !preselected ? (
             <p role="status" className="mb-6 rounded-xl bg-muted p-4 text-sm leading-6">
               The {vehicleName(vehicle)} is not available for test drives right now. Choose another vehicle below,
@@ -84,7 +84,7 @@ export default async function BookPage({ searchParams }: Props) {
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               Our team answers every day. All times are US Central.
             </p>
-            <a href={`tel:${SITE.phone}`} className="mt-4 inline-flex items-center gap-2 text-base font-semibold">
+            <a href={`tel:${SITE.phone}`} className="mt-4 inline-flex min-h-11 items-center gap-2 text-base font-semibold">
               <Phone className="size-4" aria-hidden="true" />
               {SITE.phoneDisplay}
             </a>

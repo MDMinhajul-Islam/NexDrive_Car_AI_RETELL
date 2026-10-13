@@ -40,7 +40,7 @@ export function RangeFilter({
           </button>
         ))}
       </div>
-      <div className="space-y-1">
+      <div className="space-y-1 max-sm:flex-1">
         <Label htmlFor="dash-from" className="text-xs text-muted-foreground">
           From
         </Label>
@@ -50,10 +50,10 @@ export function RangeFilter({
           value={from}
           max={to}
           onChange={(e) => e.target.value && setParams({ from: e.target.value, to, range: null })}
-          className="h-9 w-40 bg-card"
+          className="h-9 w-full bg-card sm:w-40"
         />
       </div>
-      <div className="space-y-1">
+      <div className="space-y-1 max-sm:flex-1">
         <Label htmlFor="dash-to" className="text-xs text-muted-foreground">
           To
         </Label>
@@ -64,7 +64,7 @@ export function RangeFilter({
           min={from}
           max={today}
           onChange={(e) => e.target.value && setParams({ from, to: e.target.value, range: null })}
-          className="h-9 w-40 bg-card"
+          className="h-9 w-full bg-card sm:w-40"
         />
       </div>
     </div>

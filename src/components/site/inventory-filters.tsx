@@ -275,7 +275,7 @@ export function InventoryFilters({ facets, filters }: { facets: Facets; filters:
       <div className="lg:hidden">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="outline" className="h-10 px-4">
+            <Button variant="outline" className="h-11 w-full justify-center px-4 sm:w-auto">
               <SlidersHorizontal aria-hidden="true" />
               Filters
               {active > 0 ? (
@@ -285,7 +285,10 @@ export function InventoryFilters({ facets, filters }: { facets: Facets; filters:
               ) : null}
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-full max-w-sm overflow-y-auto">
+          <SheetContent
+            side="bottom"
+            className="max-h-[88dvh] overflow-y-auto rounded-t-2xl pb-[max(1rem,env(safe-area-inset-bottom))]"
+          >
             <SheetHeader>
               <SheetTitle>Filters</SheetTitle>
             </SheetHeader>
@@ -302,12 +305,12 @@ export function InventoryFilters({ facets, filters }: { facets: Facets; filters:
 export function InventorySort({ filters }: { filters: VehicleFilters }) {
   const { update, pending } = useFilterNavigation(filters);
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex w-full items-center gap-2 sm:w-auto">
       <Label htmlFor="inventory-sort" className="sr-only sm:not-sr-only sm:text-sm sm:text-muted-foreground">
         Sort by
       </Label>
       <Select value={filters.sort} onValueChange={(sort) => update({ sort: sort as SortValue })}>
-        <SelectTrigger id="inventory-sort" className="h-10 w-52" aria-busy={pending}>
+        <SelectTrigger id="inventory-sort" className="h-10 w-full sm:w-52" aria-busy={pending}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent align="end">

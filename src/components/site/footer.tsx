@@ -32,10 +32,10 @@ export function Footer() {
 
         <nav aria-label="Shop">
           <h2 className="text-sm font-semibold text-white">Shop</h2>
-          <ul className="mt-4 space-y-3 text-sm">
+          <ul className="mt-4 space-y-0 text-sm md:space-y-3">
             {SHOP.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="transition-colors hover:text-white">
+                <Link href={l.href} className="tap-link transition-colors hover:text-white">
                   {l.label}
                 </Link>
               </li>
@@ -45,10 +45,10 @@ export function Footer() {
 
         <nav aria-label="Company">
           <h2 className="text-sm font-semibold text-white">Company</h2>
-          <ul className="mt-4 space-y-3 text-sm">
+          <ul className="mt-4 space-y-0 text-sm md:space-y-3">
             {COMPANY.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="transition-colors hover:text-white">
+                <Link href={l.href} className="tap-link transition-colors hover:text-white">
                   {l.label}
                 </Link>
               </li>
@@ -69,13 +69,13 @@ export function Footer() {
             </li>
             <li className="flex gap-3">
               <Phone className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden="true" />
-              <a href={`tel:${SITE.phone}`} className="hover:text-white">
+              <a href={`tel:${SITE.phone}`} className="tap-link hover:text-white">
                 {SITE.phoneDisplay}
               </a>
             </li>
             <li className="flex gap-3">
               <Mail className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden="true" />
-              <a href={`mailto:${SITE.email}`} className="hover:text-white">
+              <a href={`mailto:${SITE.email}`} className="tap-link hover:text-white">
                 {SITE.email}
               </a>
             </li>

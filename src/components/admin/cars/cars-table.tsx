@@ -284,7 +284,7 @@ export function CarsTable({
           <>
             <SearchInput label="Search inventory" placeholder="Make, model, stock number or VIN" />
             <FilterSelect param="status" label="Filter by status" allLabel="All statuses" options={VEHICLE_STATUSES} />
-            <FilterSelect param="condition" label="Filter by condition" allLabel="All conditions" options={VEHICLE_CONDITIONS} className="w-48" />
+            <FilterSelect param="condition" label="Filter by condition" allLabel="All conditions" options={VEHICLE_CONDITIONS} className="sm:w-48" />
             <FilterSelect param="body" label="Filter by body type" allLabel="All body types" options={BODY_TYPES} />
             <FilterSelect
               param="featured"
@@ -302,7 +302,7 @@ export function CarsTable({
               </Button>
             ) : null}
             <Button
-              className="h-9 lg:ml-auto"
+              className="h-9 max-sm:w-full lg:ml-auto"
               onClick={() => {
                 setEditing(null);
                 setFormOpen(true);

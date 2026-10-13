@@ -267,8 +267,8 @@ export function BookingsTable({
           <>
             <SearchInput label="Search bookings" placeholder="Customer, phone, email or APT id" />
             <FilterSelect param="status" label="Filter by status" allLabel="All statuses" options={APPOINTMENT_STATUSES} />
-            <FilterSelect param="type" label="Filter by type" allLabel="All types" options={APPOINTMENT_TYPES} className="w-48" />
-            <div className="flex items-end gap-2">
+            <FilterSelect param="type" label="Filter by type" allLabel="All types" options={APPOINTMENT_TYPES} className="sm:w-48" />
+            <div className="grid w-full grid-cols-2 gap-3 sm:flex sm:w-auto sm:items-end sm:gap-2">
               <div className="space-y-1">
                 <Label htmlFor="bk-from" className="text-xs text-muted-foreground">
                   From
@@ -279,7 +279,7 @@ export function BookingsTable({
                   value={get("from")}
                   max={get("to") || undefined}
                   onChange={(e) => setParams({ from: e.target.value })}
-                  className="h-9 w-40"
+                  className="h-9 w-full sm:w-40"
                 />
               </div>
               <div className="space-y-1">
@@ -292,7 +292,7 @@ export function BookingsTable({
                   value={get("to")}
                   min={get("from") || undefined}
                   onChange={(e) => setParams({ to: e.target.value })}
-                  className="h-9 w-40"
+                  className="h-9 w-full sm:w-40"
                 />
               </div>
             </div>
@@ -305,14 +305,14 @@ export function BookingsTable({
                 <X aria-hidden="true" /> Clear
               </Button>
             ) : null}
-            <div className="flex gap-2 lg:ml-auto">
-              <Button asChild variant="outline" className="h-9">
+            <div className="flex w-full gap-2 sm:w-auto lg:ml-auto">
+              <Button asChild variant="outline" className="h-9 max-sm:flex-1">
                 {/* Server-generated file with the same filters; not limited to the current page. */}
                 <a href={exportHref} download>
                   <Download aria-hidden="true" /> Export CSV
                 </a>
               </Button>
-              <Button className="h-9" onClick={openCreate}>
+              <Button className="h-9 max-sm:flex-1" onClick={openCreate}>
                 <Plus aria-hidden="true" /> New booking
               </Button>
             </div>
@@ -356,7 +356,7 @@ export function BookingsTable({
 
       {/* Details */}
       <Sheet open={viewing !== null} onOpenChange={(open) => !open && setViewing(null)}>
-        <SheetContent className="w-full overflow-y-auto sm:max-w-md">
+        <SheetContent className="overflow-y-auto data-[side=right]:w-full sm:max-w-md">
           {viewing ? (
             <>
               <SheetHeader>

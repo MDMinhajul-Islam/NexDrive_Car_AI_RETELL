@@ -35,6 +35,8 @@ export const RATE_LIMITS = {
   slots: { name: "slots", limit: 60, windowMs: 60_000 },
   vehicleSearch: { name: "vehicle-search", limit: 90, windowMs: 60_000 },
   login: { name: "login", limit: 10, windowMs: 10 * 60_000 },
+  /** Every web call costs money, so this one is deliberately tight. */
+  webCall: { name: "web-call", limit: 3, windowMs: 10 * 60_000 },
 } as const satisfies Record<string, RateLimitRule>;
 
 export type RateLimitResult = { allowed: true } | { allowed: false; retryAfterSeconds: number };

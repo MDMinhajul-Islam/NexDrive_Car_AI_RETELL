@@ -100,7 +100,7 @@ export function CustomerFormDialog({
 
   return (
     <Dialog open={customer !== null} onOpenChange={(next) => !isSubmitting && onOpenChange(next)}>
-      <DialogContent className="max-h-[92dvh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="dialog-mobile-sheet max-h-[92dvh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>
             Edit {customer?.first_name} {customer?.last_name}
@@ -177,7 +177,7 @@ export function CustomerFormDialog({
             <Textarea id="cf-notes" rows={3} maxLength={4000} {...register("notes")} />
           </FormField>
 
-          <DialogFooter>
+          <DialogFooter className="max-sm:sticky max-sm:bottom-0 max-sm:-mx-4 max-sm:border-t max-sm:bg-popover max-sm:px-4 max-sm:py-3">
             <Button type="button" variant="outline" className="h-9" disabled={isSubmitting} onClick={() => onOpenChange(false)}>
               Cancel
             </Button>

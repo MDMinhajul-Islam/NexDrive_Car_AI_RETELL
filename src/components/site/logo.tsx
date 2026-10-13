@@ -6,7 +6,7 @@ export function Logo({ className }: { className?: string }) {
     <Link
       href="/"
       aria-label="NexDrive home"
-      className={cn("inline-flex items-center gap-2 text-lg font-semibold tracking-tight", className)}
+      className={cn("inline-flex min-h-11 items-center gap-2 text-lg font-semibold tracking-tight", className)}
     >
       <span
         aria-hidden="true"

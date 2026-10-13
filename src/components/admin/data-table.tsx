@@ -159,7 +159,7 @@ export function DataTable<T extends RowData>({
         >
           <p className="text-sm font-medium">{selectedIds.length} selected</p>
           {bulkActions?.(selectedIds, () => setRowSelection({}))}
-          <Button variant="ghost" size="sm" onClick={() => setRowSelection({})}>
+          <Button variant="ghost" size="sm" onClick={() => setRowSelection({})} className="max-sm:px-3">
             Clear selection
           </Button>
         </div>
@@ -259,7 +259,7 @@ export function DataTable<T extends RowData>({
         <p className="text-sm text-muted-foreground" aria-live="polite">
           {total === 0 ? "0 results" : `${formatNumber(from)} to ${formatNumber(to)} of ${formatNumber(total)}`}
         </p>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span id="rows-per-page" className="text-sm text-muted-foreground">
               Rows

@@ -16,6 +16,7 @@ import { CarCard } from "@/components/site/car-card";
 import { EmptyState } from "@/components/site/empty-state";
 import { Reveal } from "@/components/site/reveal";
 import { SectionHeading } from "@/components/site/section";
+import { VoiceCallButton } from "@/components/site/voice-call/voice-call-button";
 import { getFacets, getFeaturedVehicles } from "@/lib/data/vehicles";
 import { SITE_IMAGES } from "@/lib/images";
 
@@ -104,14 +105,21 @@ export default async function HomePage() {
         <div className="container-page flex min-h-[calc(100dvh-4rem)] max-h-[56rem] flex-col justify-center py-24">
           <Reveal className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-brand">Plano, Texas</p>
-            <h1 className="mt-4 text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+            <h1 className="mt-4 text-[2.5rem] font-semibold leading-[1.05] tracking-tight min-[400px]:text-5xl sm:text-6xl lg:text-7xl">
               Drive the car you actually want.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-neutral-200">
               Thousands of inspected new, certified and pre-owned vehicles with one clear price. Browse online,
               book a test drive in under a minute and let our team handle the rest.
             </p>
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          </Reveal>
+
+          {/* CTA row. From md up the call button is part of this row, pushed to the container's
+              right edge, so it is level with the two buttons and can never sit on top of them.
+              This wrapper must stay a plain div: a transformed ancestor would capture the
+              phone layout's absolute positioning below. */}
+          <div className="mt-10 flex flex-wrap items-center gap-x-10 gap-y-6">
+            <Reveal delay={0.1} className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
               <Button asChild className="h-12 px-7 text-base">
                 <Link href="/cars">
                   Browse Inventory <ArrowRight aria-hidden="true" />
@@ -124,8 +132,12 @@ export default async function HomePage() {
               >
                 <Link href="/book">Book a Test Drive</Link>
               </Button>
-            </div>
-          </Reveal>
+            </Reveal>
+
+            {/* Phones: pinned to the hero's bottom-right corner, inside its 96px bottom padding
+                (24px offset + 56px circle), so it cannot reach the stacked CTAs. */}
+            <VoiceCallButton className="absolute bottom-6 right-4 sm:right-6 md:static md:ml-auto" />
+          </div>
         </div>
       </section>
 

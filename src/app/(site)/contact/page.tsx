@@ -30,8 +30,8 @@ export default function ContactPage() {
         description="Questions about a vehicle, financing or a trade-in? Send a message and a specialist will reply within one business day."
       />
 
-      <div className="container-page grid gap-12 py-12 lg:grid-cols-[minmax(0,1fr)_24rem] lg:py-16">
-        <section aria-labelledby="contact-form-heading" className="rounded-2xl border bg-card p-6 sm:p-8">
+      <div className="container-page grid grid-cols-1 gap-12 py-12 lg:grid-cols-[minmax(0,1fr)_24rem] lg:py-16">
+        <section aria-labelledby="contact-form-heading" className="min-w-0 rounded-2xl border bg-card p-4 sm:p-8">
           <h2 id="contact-form-heading" className="mb-6 text-xl font-semibold tracking-tight">
             Send us a message
           </h2>
@@ -55,7 +55,7 @@ export default function ContactPage() {
               <Phone className="mt-0.5 size-5 shrink-0 text-brand-ink" aria-hidden="true" />
               <div>
                 <h2 className="font-semibold">Phone</h2>
-                <a href={`tel:${SITE.phone}`} className="mt-1 block text-muted-foreground hover:text-foreground">
+                <a href={`tel:${SITE.phone}`} className="tap-link mt-1 text-muted-foreground hover:text-foreground md:block">
                   {SITE.phoneDisplay}
                 </a>
               </div>
@@ -64,7 +64,7 @@ export default function ContactPage() {
               <Mail className="mt-0.5 size-5 shrink-0 text-brand-ink" aria-hidden="true" />
               <div>
                 <h2 className="font-semibold">Email</h2>
-                <a href={`mailto:${SITE.email}`} className="mt-1 block text-muted-foreground hover:text-foreground">
+                <a href={`mailto:${SITE.email}`} className="tap-link mt-1 text-muted-foreground hover:text-foreground md:block">
                   {SITE.email}
                 </a>
               </div>
@@ -112,7 +112,7 @@ export default function ContactPage() {
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-semibold underline underline-offset-4"
+              className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold underline underline-offset-4"
             >
               <Navigation className="size-4" aria-hidden="true" />
               Get directions

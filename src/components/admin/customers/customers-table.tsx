@@ -194,7 +194,7 @@ export function CustomersTable({
       <CustomerFormDialog customer={editing} onOpenChange={(open) => !open && setEditing(null)} />
 
       <Sheet open={viewing !== null} onOpenChange={(open) => !open && setViewing(null)}>
-        <SheetContent className="w-full overflow-y-auto sm:max-w-md">
+        <SheetContent className="overflow-y-auto data-[side=right]:w-full sm:max-w-md">
           {viewing ? (
             <>
               <SheetHeader>

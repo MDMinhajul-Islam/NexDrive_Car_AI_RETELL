@@ -11,7 +11,7 @@ export function FilterSelect({
   label,
   allLabel,
   options,
-  className = "w-44",
+  className = "sm:w-44",
 }: {
   param: string;
   label: string;
@@ -23,7 +23,7 @@ export function FilterSelect({
   const items = options.map((o) => (typeof o === "string" ? { value: o, label: o } : o));
   return (
     <Select value={get(param) || ALL} onValueChange={(v) => setParams({ [param]: v === ALL ? null : v })}>
-      <SelectTrigger aria-label={label} className={`h-9 ${className}`}>
+      <SelectTrigger aria-label={label} className={`h-9 w-[calc(50%-0.375rem)] ${className}`}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

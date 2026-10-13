@@ -10,7 +10,7 @@ export default function InventoryLoading() {
         title="Find your next vehicle"
         description="Every car on this page is on our Texas lots or on its way. Prices are current and updated as stock changes."
       />
-      <div className="container-page grid gap-8 py-10 lg:grid-cols-[18rem_1fr] lg:py-14" aria-busy="true">
+      <div className="container-page grid grid-cols-1 gap-6 py-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-8 lg:py-14" aria-busy="true">
         <span className="sr-only" role="status">
           Loading inventory
         </span>

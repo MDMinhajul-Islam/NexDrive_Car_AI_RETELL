@@ -9,7 +9,8 @@
 #     --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY=<site key> .
 # Run:
 #   docker run -p 3000:3000 \
-#     -e WEBSITE_BOOKING_KEY=<secret> -e TURNSTILE_SECRET_KEY=<secret> nexdrive
+#     -e WEBSITE_BOOKING_KEY=<secret> -e TURNSTILE_SECRET_KEY=<secret> \
+#     -e RETELL_API_KEY=<secret> -e RETELL_AGENT_ID=<agent id> nexdrive
 
 FROM node:22-alpine AS base
 # libc6-compat: glibc shim some native Node addons expect on Alpine (musl).

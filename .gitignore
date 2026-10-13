@@ -43,3 +43,9 @@ next-env.d.ts
 
 # supabase cli
 supabase/.temp
+
+# verification builds (npm run build:check)
+/.next-check/
+
+# output of npm run check:responsive
+/screenshots/

@@ -1,9 +1,13 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 
-/** Subtle fade and slide when a block scrolls into view. Disabled for reduced motion. */
+/**
+ * Subtle fade and slide when a block scrolls into view.
+ * Always renders the same element: for visitors who prefer reduced motion the slide is
+ * removed by <MotionProvider>, so there is no server/client markup difference.
+ */
 export function Reveal({
   children,
   delay = 0,
@@ -13,8 +17,6 @@ export function Reveal({
   delay?: number;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
-  if (reduce) return <div className={className}>{children}</div>;
   return (
     <motion.div
       className={className}

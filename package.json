@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "db:types": "supabase gen types typescript --project-id ygpovphiyldawtlqhbmy > src/types/database.ts"
+    "db:types": "supabase gen types typescript --project-id ygpovphiyldawtlqhbmy > src/types/database.ts",
+    "build:check": "NEXT_DIST_DIR=.next-check next build",
+    "start:check": "NEXT_DIST_DIR=.next-check next start",
+    "check:responsive": "node scripts/responsive-check.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -28,6 +31,7 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.90.0",
     "recharts": "^3.10.1",
+    "retell-client-js-sdk": "^3.0.2",
     "server-only": "^0.0.1",
     "shadcn": "^4.21.4",
     "sharp": "^0.35.5",
@@ -44,6 +48,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.27",
+    "playwright": "^1.64.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

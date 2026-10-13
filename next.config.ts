@@ -10,6 +10,11 @@ const supabaseHost = (() => {
 })();
 
 const nextConfig: NextConfig = {
+  // `next dev` and `next build` both write to this folder. Running a build while the dev
+  // server is up corrupts the dev server's files and it starts answering 404 or 500 for
+  // routes such as /icon.svg. `npm run build:check` sets NEXT_DIST_DIR so a verification
+  // build never touches the dev server's .next folder. Docker and Dokploy use the default.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   // Self-contained server bundle in .next/standalone for the Docker image.
   output: "standalone",
   images: {

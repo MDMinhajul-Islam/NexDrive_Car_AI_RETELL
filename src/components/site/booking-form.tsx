@@ -319,7 +319,7 @@ export function BookingForm({
                     <button
                       type="button"
                       onClick={() => chooseVehicle(option)}
-                      className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm transition-colors hover:bg-muted focus-visible:bg-muted"
+                      className="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm transition-colors hover:bg-muted focus-visible:bg-muted"
                     >
                       <span className="min-w-0 truncate font-medium">{option.name}</span>
                       <span className="shrink-0 text-muted-foreground">{formatCurrency(option.price)}</span>
@@ -392,7 +392,7 @@ export function BookingForm({
                       setValue("salespersonId", slot.salespersonId, { shouldValidate: true });
                     }}
                     className={cn(
-                      "h-10 rounded-lg border text-sm font-medium transition-colors",
+                      "h-11 rounded-lg border text-sm font-medium transition-colors",
                       selected ? "border-neutral-950 bg-neutral-950 text-white" : "hover:border-neutral-400 hover:bg-muted",
                     )}
                   >
@@ -417,6 +417,7 @@ export function BookingForm({
           rows={compact ? 3 : 4}
           maxLength={1000}
           placeholder="Anything we should know before your visit?"
+          className="min-h-24"
         />
       </FormField>
 

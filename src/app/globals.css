@@ -168,3 +168,78 @@
     padding-inline: 2rem;
   }
 }
+
+/*
+ * Phones (below Tailwind's md breakpoint).
+ * Unlayered on purpose so these floors win over component utility classes.
+ *  - Form controls use 16px text: anything smaller makes iOS Safari zoom the page on focus.
+ *  - Every control is at least 44px tall, the minimum comfortable tap target.
+ */
+@media (max-width: 47.99rem) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):not([type="range"]),
+  select,
+  textarea,
+  [data-slot="select-trigger"] {
+    font-size: 16px;
+    min-height: 2.75rem;
+  }
+
+  button:not([role="checkbox"]):not([role="switch"]):not([data-tap="free"]),
+  [data-slot="button"],
+  [role="button"],
+  summary {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+  }
+
+  [role="option"],
+  [role="menuitem"],
+  [role="menuitemradio"],
+  [role="menuitemcheckbox"] {
+    min-height: 2.75rem;
+  }
+
+  /* Small visual controls keep their size and get a larger invisible hit area. */
+  [role="checkbox"],
+  [role="switch"] {
+    position: relative;
+  }
+  [role="checkbox"]::before,
+  [role="switch"]::before {
+    content: "";
+    position: absolute;
+    inset: -0.875rem;
+  }
+
+  /* Standalone links (navigation, footers, chips): tall enough to tap. */
+  .tap-link {
+    display: inline-flex;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    align-items: center;
+  }
+}
+
+/*
+ * A dialog that becomes a full-screen sheet on phones, respecting the notch and home bar.
+ * Add to <DialogContent className="dialog-mobile-sheet ...">.
+ */
+@media (max-width: 39.99rem) {
+  .dialog-mobile-sheet {
+    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: 100dvh;
+    translate: 0 0;
+    transform: none;
+    border-radius: 0;
+    overflow-y: auto;
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}

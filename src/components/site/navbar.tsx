@@ -60,7 +60,7 @@ export function Navbar() {
           <Button
             asChild
             variant="outline"
-            className="h-9 border-white/20 bg-transparent px-3 text-white hover:bg-white/10 hover:text-white"
+            className="h-11 border-white/20 bg-transparent px-3 text-white hover:bg-white/10 hover:text-white md:h-9"
           >
             <Link href="/admin/login">
               <ShieldCheck aria-hidden="true" />
@@ -73,13 +73,13 @@ export function Navbar() {
               <Button
                 variant="ghost"
                 size="icon-lg"
-                className="text-white hover:bg-white/10 hover:text-white md:hidden"
+                className="size-11 text-white hover:bg-white/10 hover:text-white md:hidden"
                 aria-label="Open menu"
               >
                 <Menu aria-hidden="true" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-72 border-white/10 bg-neutral-950 text-white">
+            <SheetContent side="right" className="w-[min(20rem,85vw)] overflow-y-auto border-white/10 bg-neutral-950 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-white">
               <SheetHeader>
                 <SheetTitle className="text-white">Menu</SheetTitle>
               </SheetHeader>
@@ -105,6 +105,16 @@ export function Navbar() {
                   <Phone className="size-4" aria-hidden="true" />
                   {SITE.phoneDisplay}
                 </a>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="mt-2 h-12 justify-start border-white/20 bg-transparent px-3 text-base text-white hover:bg-white/10 hover:text-white"
+                >
+                  <Link href="/admin/login" onClick={() => setOpen(false)}>
+                    <ShieldCheck aria-hidden="true" />
+                    Admin
+                  </Link>
+                </Button>
               </nav>
             </SheetContent>
           </Sheet>

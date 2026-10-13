@@ -14,7 +14,7 @@ function pageWindow(current: number, total: number): (number | "gap")[] {
 }
 
 const base =
-  "inline-flex h-10 min-w-10 items-center justify-center gap-1 rounded-lg border px-3 text-sm font-medium transition-colors";
+  "inline-flex h-11 min-w-11 items-center justify-center gap-1 rounded-lg border px-3 text-sm font-medium transition-colors";
 
 export function Pagination({
   page,

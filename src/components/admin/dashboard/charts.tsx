@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   Bar,
   BarChart,
@@ -128,24 +128,39 @@ const toTableRows = (data: ChartDatum[]): ChartTableRow[] =>
 
 const truncate = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
 
+/** True below 480px. Charts are client-only drawings, so reading the viewport here is safe. */
+function useIsPhone() {
+  const [phone, setPhone] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 479px)");
+    const update = () => setPhone(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  return phone;
+}
+
 /** Y-axis tick for ranked bars: label, optional second line, optional link to the record. */
 function CategoryTick({
   x = 0,
   y = 0,
   payload,
   byId,
+  maxChars = 22,
 }: {
   x?: number;
   y?: number;
   payload?: { value?: string };
   byId: Map<string, ChartDatum>;
+  maxChars?: number;
 }) {
   const datum = byId.get(String(payload?.value ?? ""));
   if (!datum) return null;
   const text = (
     <text x={x - 8} y={y} textAnchor="end" fontSize={12}>
       <tspan x={x - 8} dy={datum.sublabel ? "-0.25em" : "0.32em"} fill="#44403c">
-        {truncate(datum.label, 22)}
+        {truncate(datum.label, maxChars)}
       </tspan>
       {datum.sublabel ? (
         <tspan x={x - 8} dy="1.25em" fill="#78716c" fontSize={11}>
@@ -277,6 +292,7 @@ export function RankedBars({
   emptyText: string;
 }) {
   const byId = useMemo(() => new Map(data.map((d) => [d.id, d])), [data]);
+  const phone = useIsPhone();
   if (data.length === 0 || data.every((d) => d.value === 0)) return <Empty>{emptyText}</Empty>;
   const twoLine = data.some((d) => d.sublabel);
   const height = Math.max(160, data.length * (twoLine ? 44 : 34) + 24);
@@ -291,10 +307,10 @@ export function RankedBars({
             <YAxis
               type="category"
               dataKey="id"
-              tick={<CategoryTick byId={byId} />}
+              tick={<CategoryTick byId={byId} maxChars={phone ? 15 : 22} />}
               tickLine={false}
               axisLine={{ stroke: GRID }}
-              width={150}
+              width={phone ? 108 : 150}
               interval={0}
             />
             <Tooltip cursor={{ fill: "#f5f5f4" }} content={<ChartTooltip unit={unit} title={tooltipTitle} />} />

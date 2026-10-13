@@ -112,7 +112,7 @@ export function ContactForm({ turnstileEnabled }: { turnstileEnabled: boolean })
         </FormField>
       </div>
       <FormField id="ct-message" label="How can we help?" required error={errors.message?.message}>
-        <Textarea {...register("message")} {...fieldA11y("ct-message", errors.message?.message)} rows={6} maxLength={4000} />
+        <Textarea {...register("message")} {...fieldA11y("ct-message", errors.message?.message)} rows={6} maxLength={4000} className="min-h-36" />
       </FormField>
 
       <input type="hidden" {...register("turnstileToken")} />
@@ -129,7 +129,7 @@ export function ContactForm({ turnstileEnabled }: { turnstileEnabled: boolean })
         </p>
       ) : null}
 
-      <Button type="submit" disabled={isSubmitting} className="h-11 px-6 text-base">
+      <Button type="submit" disabled={isSubmitting} className="h-11 w-full px-6 text-base sm:w-auto">
         {isSubmitting ? (
           <>
             <Loader2 className="animate-spin" aria-hidden="true" /> Sending

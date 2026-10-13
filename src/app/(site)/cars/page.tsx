@@ -65,7 +65,7 @@ export default async function InventoryPage({ searchParams }: Props) {
         description="Every car on this page is on our Texas lots or on its way. Prices are current and updated as stock changes."
       />
 
-      <div className="container-page grid gap-8 py-10 lg:grid-cols-[18rem_1fr] lg:py-14">
+      <div className="container-page grid grid-cols-1 gap-6 py-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-8 lg:py-14">
         <InventoryFilters facets={facets} filters={filters} />
 
         <section aria-labelledby="results-heading" className="min-w-0 space-y-6">
@@ -92,7 +92,7 @@ export default async function InventoryPage({ searchParams }: Props) {
                     href={`/cars${filtersToQuery({ ...filters, ...chip.without, page: 1 })}`}
                     scroll={false}
                     aria-label={`Remove filter ${chip.label}`}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-full border bg-muted/60 pl-3 pr-2 text-sm transition-colors hover:bg-muted"
+                    className="inline-flex h-11 items-center gap-1.5 rounded-full border bg-muted/60 pl-4 pr-3 text-sm transition-colors hover:bg-muted md:h-8 md:pl-3 md:pr-2"
                   >
                     {chip.label}
                     <X className="size-3.5 text-muted-foreground" aria-hidden="true" />

@@ -33,7 +33,7 @@ export default async function AdminLoginPage({ searchParams }: Props) {
         </div>
         <Link
           href="/"
-          className="mt-6 flex items-center justify-center gap-2 text-sm text-neutral-300 hover:text-white"
+          className="mt-4 flex min-h-11 items-center justify-center gap-2 text-sm text-neutral-300 hover:text-white"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           Back to the website

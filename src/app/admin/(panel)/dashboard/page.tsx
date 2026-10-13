@@ -32,7 +32,7 @@ function Card({
   className?: string;
 }) {
   return (
-    <section className={`rounded-xl border bg-card p-5 ${className}`}>
+    <section className={`min-w-0 rounded-xl border bg-card p-4 sm:p-5 ${className}`}>
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold">{title}</h2>
@@ -47,9 +47,9 @@ function Card({
 
 function Kpi({ label, value, hint, delta }: { label: string; value: string; hint?: string; delta?: ReactNode }) {
   return (
-    <div className="rounded-xl border bg-card p-5">
+    <div className="min-w-0 rounded-xl border bg-card p-4 sm:p-5">
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
+      <p className="mt-2 break-words text-xl font-semibold tracking-tight tabular-nums sm:text-2xl">{value}</p>
       {delta}
       {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
     </div>
@@ -143,7 +143,7 @@ export default async function AdminDashboardPage({ searchParams }: Props) {
         </p>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 xl:grid-cols-4">
         <Kpi label="Total bookings" value={k ? formatNumber(k.totalBookings) : "N/A"} hint="In the selected range" />
         <Kpi
           label="Bookings this month"
@@ -174,7 +174,7 @@ export default async function AdminDashboardPage({ searchParams }: Props) {
         />
       </div>
 
-      <div className="mt-4 grid gap-4 xl:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-3">
         <Card
           title="Bookings over time"
           description={`Bookings created per day, last ${range.trend} days to ${formatDate(range.to, { month: "short", day: "numeric" })}`}
@@ -276,7 +276,7 @@ export default async function AdminDashboardPage({ searchParams }: Props) {
         </Card>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card
           title="Recent bookings"
           description="The latest bookings from every channel"

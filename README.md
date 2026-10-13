@@ -38,11 +38,16 @@ cp .env.example .env.local   # then fill in the values
 npm run dev                  # http://localhost:3000
 ```
 
+Do not run `npm run build` while the dev server is running. Both write to `.next`, and the dev server then returns 404 or 500 for routes such as `/icon.svg` until it is restarted. Use `npm run build:check` instead.
+
 Other scripts:
 
 | Command | What it does |
 |---|---|
 | `npm run build` | Production build |
+| `npm run build:check` | Production build into `.next-check`. Use this while `npm run dev` is running |
+| `npm run start:check` | Serve the `.next-check` build |
+| `npm run check:responsive` | Playwright check: screenshots at 390px and 1440px, plus overflow, tap-target and input-size audits at six widths. Needs the site running. Output goes to `screenshots/` |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript, no emit |
 | `npm run db:types` | Regenerate `src/types/database.ts` (needs `npx supabase login`) |
@@ -57,11 +62,13 @@ Other scripts:
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Turnstile widget on booking and contact forms | Public, build time |
 | `WEBSITE_BOOKING_KEY` | Shared secret sent to Postgres when creating a booking | Server secret, runtime |
 | `TURNSTILE_SECRET_KEY` | Verifies Turnstile tokens in Server Actions | Server secret, runtime |
+| `RETELL_API_KEY` | Creates web calls to the voice agent. Optional | Server secret, runtime |
+| `RETELL_AGENT_ID` | The Retell agent the website calls. Optional | Server secret, runtime |
 
 Rules that matter:
 
 - `NEXT_PUBLIC_*` values are inlined into the JavaScript at **build** time. Changing them needs a rebuild.
-- The two server secrets are read at **runtime** and never reach the browser.
+- The server secrets are read at **runtime** and never reach the browser.
 - The Supabase **service role key is not used anywhere**. Do not add it.
 - Turnstile is optional. It is on only when both Turnstile keys are set. With `TURNSTILE_SECRET_KEY` empty the check is skipped and the widget is hidden.
 
@@ -121,6 +128,27 @@ Everyone else is redirected away from `/admin`, including signed-in users withou
 
 To get keys: Cloudflare dashboard, Turnstile, **Add widget**, add your domain (and `localhost` for local testing).
 
+## Voice assistant web call
+
+The home page hero has a "Talk to our AI assistant" button that starts a browser call with the Retell voice agent.
+
+- **How it works.** The browser asks `POST /api/retell/web-call` for a call. The server creates it with Retell's `v3/create-web-call` API and returns a short-lived access token for that one call. The Retell API key stays on the server.
+- **Identifying website calls.** Each call is created with metadata `source: "website"` and the dynamic variables `{{source}}` and `{{channel}}`, so it can be told apart from phone calls in Retell.
+- **Cost protection.** The route refuses requests without a same-origin `Origin` header, allows 3 calls per IP per 10 minutes, and checks Turnstile first when Turnstile is enabled.
+- **Loading.** The call panel and the Retell SDK are downloaded only after the button is clicked.
+- **Requirements.** The microphone needs HTTPS in production. `localhost` works for testing.
+- **Optional.** Without `RETELL_API_KEY` and `RETELL_AGENT_ID` the panel says the assistant is unavailable.
+
+SDK note: this uses `RetellWebClient` from `retell-client-js-sdk` 3.x with a server-created token. Retell marks that class as deprecated and plans to remove it in SDK 4.0, so keep the package on 3.x until the panel is migrated. On v3 calls Retell no longer sends exact "agent talking" events or a transcript, so the panel detects speech from the agent's audio level, and shows a transcript only if the call provides one.
+
+## Responsive check
+
+`npm run check:responsive` opens every main page in headless Chromium at 360, 390, 414, 768, 1024 and 1440px. It fails if any page scrolls sideways or throws a browser error, and it lists tap targets under 44px and form controls with text under 16px on phones. Screenshots for 390px and 1440px, and a `report.json`, are written to `screenshots/`.
+
+- Start the site first (`npm run dev`), or point the script at another host with `BASE_URL`.
+- First run on a machine: `npx playwright install chromium`.
+- Admin pages are included only when `E2E_ADMIN_EMAIL` and `E2E_ADMIN_PASSWORD` are set. Use a dedicated test admin.
+
 ## Project structure
 
 ```
@@ -130,6 +158,7 @@ src/
     admin/           login and the protected panel
     actions/         Server Actions (all mutations); actions/admin for the panel
     api/health/      liveness probe
+    api/retell/      creates web calls to the voice agent
   components/        ui (shadcn), site, admin
   lib/
     supabase/        browser, server and middleware clients
@@ -164,6 +193,8 @@ docker build -t nexdrive \
 docker run -p 3000:3000 \
   -e WEBSITE_BOOKING_KEY=<secret> \
   -e TURNSTILE_SECRET_KEY=<secret> \
+  -e RETELL_API_KEY=<secret> \
+  -e RETELL_AGENT_ID=<agent id> \
   nexdrive
 ```
 
@@ -189,6 +220,8 @@ docker run -p 3000:3000 \
    ```
    WEBSITE_BOOKING_KEY=<same value as the Vault secret>
    TURNSTILE_SECRET_KEY=<secret key>
+   RETELL_API_KEY=<Retell API key>
+   RETELL_AGENT_ID=<Retell agent id>
    ```
 
    Do not put secrets in Build Args. Build args are visible in the image history.
@@ -203,7 +236,7 @@ After deploying:
 - Add the domain to the Turnstile widget's hostname list.
 - In Supabase, Authentication, URL Configuration, set Site URL to the domain.
 - Keep the app at **one replica** while the rate limiter is in memory.
-- Dokploy's proxy forwards the visitor address in `X-Forwarded-For`, which the rate limiter reads.
+- Dokploy's proxy sets `X-Real-IP` and `X-Forwarded-For` to the visitor address, which the rate limiter reads. If you put Cloudflare in front, also set `TRUST_CLOUDFLARE_IP=true` in Environment so limits apply per visitor and not per Cloudflare node.
 
 ## Deploy on Vercel
 

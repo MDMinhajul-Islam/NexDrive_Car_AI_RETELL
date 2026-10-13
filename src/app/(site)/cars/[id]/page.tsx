@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { Award, CalendarX, Check, ChevronRight, MapPin, Phone, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { BookingForm } from "@/components/site/booking-form";
 import { CarCard } from "@/components/site/car-card";
 import { Gallery } from "@/components/site/gallery";
@@ -101,7 +102,7 @@ export default async function VehiclePage({ params }: Props) {
   };
 
   return (
-    <div className="container-page py-8 lg:py-12">
+    <div className={cn("container-page py-8 lg:py-12", "max-lg:pb-28")}>
       <script
         type="application/ld+json"
         // Escape "<" so vehicle data can never close the script tag.
@@ -111,19 +112,19 @@ export default async function VehiclePage({ params }: Props) {
       <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
         <ol className="flex flex-wrap items-center gap-1.5">
           <li>
-            <Link href="/" className="hover:text-foreground">
+            <Link href="/" className="tap-link hover:text-foreground">
               Home
             </Link>
           </li>
           <ChevronRight className="size-3.5" aria-hidden="true" />
           <li>
-            <Link href="/cars" className="hover:text-foreground">
+            <Link href="/cars" className="tap-link hover:text-foreground">
               Inventory
             </Link>
           </li>
           <ChevronRight className="size-3.5" aria-hidden="true" />
           <li>
-            <Link href={`/cars?make=${encodeURIComponent(vehicle.make)}`} className="hover:text-foreground">
+            <Link href={`/cars?make=${encodeURIComponent(vehicle.make)}`} className="tap-link hover:text-foreground">
               {vehicle.make}
             </Link>
           </li>
@@ -134,7 +135,7 @@ export default async function VehiclePage({ params }: Props) {
         </ol>
       </nav>
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_26rem]">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_26rem]">
         <div className="min-w-0 space-y-12">
           <Gallery images={vehicle.images} alt={`${name} in ${vehicle.exterior_color}`} bodyType={vehicle.body_type} />
 
@@ -227,11 +228,19 @@ export default async function VehiclePage({ params }: Props) {
                 <caption className="sr-only">Specifications for the {name}</caption>
                 <tbody className="divide-y">
                   {specs.map(([label, value]) => (
-                    <tr key={label} className="even:bg-muted/40">
-                      <th scope="row" className="w-2/5 px-5 py-3 text-left font-normal text-muted-foreground">
+                    <tr key={label} className="flex flex-col even:bg-muted/40 sm:table-row">
+                      <th
+                        scope="row"
+                        className="px-4 pt-3 text-left text-xs font-normal uppercase tracking-wide text-muted-foreground sm:w-2/5 sm:px-5 sm:py-3 sm:text-sm sm:normal-case sm:tracking-normal"
+                      >
                         {label}
                       </th>
-                      <td className={label === "VIN" || label === "Stock number" ? "px-5 py-3 font-mono" : "px-5 py-3 font-medium"}>
+                      <td
+                        className={cn(
+                          "break-words px-4 pb-3 pt-0.5 sm:px-5 sm:py-3",
+                          label === "VIN" || label === "Stock number" ? "font-mono" : "font-medium",
+                        )}
+                      >
                         {value}
                       </td>
                     </tr>
@@ -243,8 +252,8 @@ export default async function VehiclePage({ params }: Props) {
         </div>
 
         {/* Booking */}
-        <aside aria-labelledby="book-heading" className="lg:sticky lg:top-24 lg:self-start">
-          <div id="book" className="scroll-mt-24 rounded-2xl border bg-card p-6">
+        <aside aria-labelledby="book-heading" className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+          <div id="book" className="scroll-mt-24 rounded-2xl border bg-card p-4 sm:p-6">
             <h2 id="book-heading" className="text-xl font-semibold tracking-tight">
               Book a test drive
             </h2>
@@ -290,6 +299,21 @@ export default async function VehiclePage({ params }: Props) {
             {vehicle.warranty}. Price excludes tax, title, license and dealer fees.
           </p>
         </aside>
+      </div>
+
+      {/* Phones and tablets: price and the main action stay reachable while scrolling. */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 backdrop-blur lg:hidden">
+        <div className="container-page flex items-center justify-between gap-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
+          <div className="min-w-0">
+            <p className="truncate text-xs text-muted-foreground">
+              {vehicle.year} {vehicle.make} {vehicle.model}
+            </p>
+            <p className="text-lg font-semibold tracking-tight">{formatCurrency(vehicle.sale_price)}</p>
+          </div>
+          <Button asChild className="h-12 shrink-0 px-5 text-base">
+            {bookable ? <a href="#book">Book Test Drive</a> : <a href={`tel:${SITE.phone}`}>Call us</a>}
+          </Button>
+        </div>
       </div>
 
       {similar.length > 0 ? (
