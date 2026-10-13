@@ -269,7 +269,11 @@ export async function getFacets(): Promise<Facets> {
   };
 }
 
-/** Whether a vehicle can be booked for a test drive (same rule the database enforces). */
+/**
+ * Whether the website offers a test-drive booking for this vehicle.
+ * Stricter than the table constraint on purpose: get_test_drive_slots only returns
+ * times when the status is exactly 'Available' (Demo Vehicles get no slots).
+ */
 export function isTestDriveEligible(v: Pick<Vehicle, "vehicle_status" | "test_drive_available">) {
-  return v.test_drive_available && (v.vehicle_status === "Available" || v.vehicle_status === "Demo Vehicle");
+  return v.test_drive_available && v.vehicle_status === "Available";
 }

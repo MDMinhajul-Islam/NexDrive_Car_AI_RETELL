@@ -29,6 +29,14 @@ select jsonb_pretty(jsonb_build_object(
       'body', regexp_replace(regexp_replace(p.prosrc, '--[^\n\r]*', '', 'g'), '\s+', ' ', 'g')))
     from pg_proc p where p.pronamespace = 'public'::regnamespace
       and p.proname in ('resolve_or_create_customer', 'upsert_lead_atomic', 'get_test_drive_slots')),
+  -- How the existing key check works (header name and storage location only; this
+  -- prints the function source, which should not contain the secret value itself).
+  'retell_key_check', (
+    select jsonb_agg(jsonb_build_object('schema', n.nspname, 'name', p.proname,
+      'body', regexp_replace(p.prosrc, '\s+', ' ', 'g')))
+    from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where p.proname = 'require_retell_tool_key'),
+  'vault_available', exists (select 1 from pg_extension where extname = 'supabase_vault'),
   -- Item 8: image hosts to allow in next.config
   'model_image_hosts', (
     select jsonb_agg(distinct substring(image_url from '^https://([^/]+)')) from public.vehicle_model_images),

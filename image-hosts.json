@@ -1,0 +1,21 @@
+{
+  "_comment": "Hosts next/image may optimize. Read by next.config.ts and src/lib/images.ts. '*.' matches one subdomain level. Source: distinct hosts in vehicle_model_images.image_url plus Unsplash. media.chromedata.com is deliberately NOT listed: it takes about 12 seconds to respond, longer than the optimizer's upstream timeout, so its photos are loaded by the browser directly.",
+  "hosts": [
+    "images.unsplash.com",
+    "cdn-ds.com",
+    "cdn.jdpower.com",
+    "dealerinspire-image-library-prod.s3.us-east-1.amazonaws.com",
+    "*.dealerinspire.com",
+    "gld-creative.s3.us-west-2.amazonaws.com",
+    "hips.hearstapps.com",
+    "images.dealer.com",
+    "images.hgmsites.net",
+    "mystrongad.com",
+    "scout.customerscout.net",
+    "www.edmunds.com",
+    "www.fmdt.info",
+    "www.kia.com",
+    "www.lawtonkia.com",
+    "www.tulsahyundai.com"
+  ]
+}

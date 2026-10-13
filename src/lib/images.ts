@@ -1,3 +1,4 @@
+import imageHosts from "../../image-hosts.json";
 import { SUPABASE_URL } from "@/lib/env";
 import { VEHICLE_IMAGE_BUCKET } from "@/lib/constants";
 
@@ -42,11 +43,14 @@ export function storageImageUrl(storagePath: string) {
 }
 
 /**
- * Hosts configured in next.config.ts `images.remotePatterns`. Anything else
- * (model photos come from assorted third-party hosts) is rendered unoptimized
- * so an unknown host can never break a page.
+ * Hosts configured in next.config.ts `images.remotePatterns` (from image-hosts.json).
+ * Anything else is rendered unoptimized so an unknown host can never break a page.
  */
-const OPTIMIZED_HOSTS = new Set(["images.unsplash.com", "www.edmunds.com", safeHost(SUPABASE_URL)]);
+const EXACT_HOSTS = new Set<string>([
+  ...imageHosts.hosts.filter((h) => !h.startsWith("*.")),
+  safeHost(SUPABASE_URL),
+]);
+const WILDCARD_SUFFIXES = imageHosts.hosts.filter((h) => h.startsWith("*.")).map((h) => h.slice(1));
 
 function safeHost(url: string) {
   try {
@@ -57,5 +61,11 @@ function safeHost(url: string) {
 }
 
 export function canOptimizeImage(src: string) {
-  return OPTIMIZED_HOSTS.has(safeHost(src));
+  const host = safeHost(src);
+  if (!host) return false;
+  if (EXACT_HOSTS.has(host)) return true;
+  // "*.example.com" matches exactly one extra label, like next/image does.
+  return WILDCARD_SUFFIXES.some(
+    (suffix) => host.endsWith(suffix) && !host.slice(0, -suffix.length).includes("."),
+  );
 }

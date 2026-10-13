@@ -15,6 +15,8 @@ export const contactSchema = z.object({
     .min(10, "Tell us a little more so we can help")
     .max(4000, "Keep your message under 4,000 characters"),
   company: z.string().max(0),
+  /** Cloudflare Turnstile token; verified in the Server Action. */
+  turnstileToken: z.string().max(4096),
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;

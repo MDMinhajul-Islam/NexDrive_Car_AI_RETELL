@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { RATE_LIMITS, rateLimit, retryMessage } from "@/lib/security/rate-limit";
+import { getClientIp } from "@/lib/security/request";
 import { createClient } from "@/lib/supabase/server";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 
@@ -15,6 +17,9 @@ function safeNext(next: string | undefined) {
 export async function signIn(input: LoginInput, next?: string): Promise<LoginResult> {
   const parsed = loginSchema.safeParse(input);
   if (!parsed.success) return { ok: false, message: "Enter your email and password." };
+
+  const limited = rateLimit(RATE_LIMITS.login, await getClientIp());
+  if (!limited.allowed) return { ok: false, message: retryMessage(limited.retryAfterSeconds) };
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword(parsed.data);

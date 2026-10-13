@@ -10,25 +10,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { fieldA11y, FormField } from "@/components/site/form-field";
+import { TURNSTILE_ENABLED, TurnstileField, type TurnstileHandle } from "@/components/site/turnstile-field";
 import { contactSchema, type ContactInput } from "@/lib/validations/contact";
 
 export function ContactForm() {
   const [sent, setSent] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const submitting = useRef(false);
+  const turnstile = useRef<TurnstileHandle>(null);
   const {
     register,
     handleSubmit,
     setError,
+    setValue,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
-    defaultValues: { name: "", email: "", phone: "", subject: "", message: "", company: "" },
+    defaultValues: { name: "", email: "", phone: "", subject: "", message: "", company: "", turnstileToken: "" },
   });
 
   const onSubmit = handleSubmit(async (values) => {
     if (submitting.current) return;
+    if (TURNSTILE_ENABLED && !values.turnstileToken) {
+      setError("turnstileToken", { message: "Please complete the verification check." });
+      return;
+    }
     submitting.current = true;
     setFormError(null);
     try {
@@ -50,6 +57,9 @@ export function ContactForm() {
       toast.error(message);
     } finally {
       submitting.current = false;
+      // Turnstile tokens are single use: get a fresh one for the next attempt.
+      turnstile.current?.reset();
+      setValue("turnstileToken", "");
     }
   });
 
@@ -104,6 +114,13 @@ export function ContactForm() {
       <FormField id="ct-message" label="How can we help?" required error={errors.message?.message}>
         <Textarea {...register("message")} {...fieldA11y("ct-message", errors.message?.message)} rows={6} maxLength={4000} />
       </FormField>
+
+      <input type="hidden" {...register("turnstileToken")} />
+      <TurnstileField
+        ref={turnstile}
+        error={errors.turnstileToken?.message}
+        onToken={(token) => setValue("turnstileToken", token, { shouldValidate: Boolean(token) })}
+      />
 
       {formError ? (
         <p role="alert" className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">

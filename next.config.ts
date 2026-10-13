@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import imageHosts from "./image-hosts.json";
 
 const supabaseHost = (() => {
   try {
@@ -9,14 +10,14 @@ const supabaseHost = (() => {
 })();
 
 const nextConfig: NextConfig = {
+  // Self-contained server bundle in .next/standalone for the Docker image.
+  output: "standalone",
   images: {
     formats: ["image/avif", "image/webp"],
-    // Keep this list in sync with OPTIMIZED_HOSTS in src/lib/images.ts.
-    // Photos from any other host still render, just without optimization.
+    // Third-party hosts live in image-hosts.json (shared with src/lib/images.ts).
+    // Photos from any host not listed there still render, just without optimization.
     remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com" },
-      // vehicle_model_images.image_url (stock model photos)
-      { protocol: "https", hostname: "www.edmunds.com", pathname: "/assets/**" },
+      ...imageHosts.hosts.map((hostname) => ({ protocol: "https" as const, hostname })),
       // Supabase Storage: public vehicle-images bucket
       ...(supabaseHost
         ? [

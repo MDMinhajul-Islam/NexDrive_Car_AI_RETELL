@@ -21,6 +21,8 @@ export const bookingSchema = z.object({
   message: z.string().trim().max(1000, "Keep your message under 1,000 characters"),
   /** Honeypot. Real visitors never fill this in. */
   company: z.string().max(0),
+  /** Cloudflare Turnstile token; verified in the Server Action. */
+  turnstileToken: z.string().max(4096),
 });
 
 export type BookingInput = z.infer<typeof bookingSchema>;

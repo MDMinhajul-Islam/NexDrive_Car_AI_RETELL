@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { fieldA11y, FormField } from "@/components/site/form-field";
+import { TURNSTILE_ENABLED, TurnstileField, type TurnstileHandle } from "@/components/site/turnstile-field";
 import { SITE } from "@/lib/constants";
 import { formatCurrency, formatDate, formatTime } from "@/lib/format";
 import { bookingSchema, type BookingInput } from "@/lib/validations/booking";
@@ -53,6 +54,7 @@ export function BookingForm({
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const submitting = useRef(false);
+  const turnstile = useRef<TurnstileHandle>(null);
 
   const {
     register,
@@ -74,6 +76,7 @@ export function BookingForm({
       salespersonId: "",
       message: "",
       company: "",
+      turnstileToken: "",
     },
   });
 
@@ -127,6 +130,10 @@ export function BookingForm({
   const onSubmit = handleSubmit(async (values) => {
     // Guard against double clicks and Enter-key repeats.
     if (submitting.current) return;
+    if (TURNSTILE_ENABLED && !values.turnstileToken) {
+      setError("turnstileToken", { message: "Please complete the verification check." });
+      return;
+    }
     submitting.current = true;
     setFormError(null);
     try {
@@ -149,6 +156,9 @@ export function BookingForm({
       toast.error(message);
     } finally {
       submitting.current = false;
+      // Turnstile tokens are single use: get a fresh one for the next attempt.
+      turnstile.current?.reset();
+      setValue("turnstileToken", "");
     }
   });
 
@@ -406,6 +416,13 @@ export function BookingForm({
           placeholder="Anything we should know before your visit?"
         />
       </FormField>
+
+      <input type="hidden" {...register("turnstileToken")} />
+      <TurnstileField
+        ref={turnstile}
+        error={errors.turnstileToken?.message}
+        onToken={(token) => setValue("turnstileToken", token, { shouldValidate: Boolean(token) })}
+      />
 
       {formError ? (
         <p role="alert" className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
