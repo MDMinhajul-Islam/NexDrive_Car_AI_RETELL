@@ -84,7 +84,7 @@ const BODY_LINKS = [
 
 export default async function HomePage() {
   const [featured, facets] = await Promise.all([getFeaturedVehicles(6), getFacets()]);
-  const brands = (facets.makes.length ? facets.makes : FALLBACK_BRANDS).slice(0, 12);
+  const brands = [...new Set(facets.makes.length ? facets.makes : FALLBACK_BRANDS)].slice(0, 12);
 
   return (
     <>

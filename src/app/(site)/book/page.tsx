@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/site/section";
 import { SITE } from "@/lib/constants";
 import { getVehicle, isTestDriveEligible } from "@/lib/data/vehicles";
 import { addDays, todayInDealershipTz, vehicleName } from "@/lib/format";
+import { isTurnstileEnabled } from "@/lib/security/turnstile";
 
 export const metadata: Metadata = {
   title: "Book a test drive",
@@ -45,6 +46,7 @@ export default async function BookPage({ searchParams }: Props) {
             </p>
           ) : null}
           <BookingForm
+            turnstileEnabled={isTurnstileEnabled()}
             minDate={today}
             maxDate={addDays(today, 60)}
             initialVehicle={

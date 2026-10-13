@@ -11,6 +11,7 @@ import { VehicleStatusBadge } from "@/components/site/status-badge";
 import { SITE } from "@/lib/constants";
 import { getSimilarVehicles, getVehicle, isTestDriveEligible } from "@/lib/data/vehicles";
 import { addDays, formatCurrency, formatMileage, todayInDealershipTz, vehicleName } from "@/lib/format";
+import { isTurnstileEnabled } from "@/lib/security/turnstile";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -68,9 +69,9 @@ export default async function VehiclePage({ params }: Props) {
     ["VIN", vehicle.vin],
   ];
 
-  const featureGroups = new Map<string, string[]>();
+  const featureGroups = new Map<string, { id: string; name: string }[]>();
   for (const f of vehicle.features) {
-    featureGroups.set(f.category, [...(featureGroups.get(f.category) ?? []), f.name]);
+    featureGroups.set(f.category, [...(featureGroups.get(f.category) ?? []), { id: f.id, name: f.name }]);
   }
 
   const jsonLd = {
@@ -199,9 +200,9 @@ export default async function VehiclePage({ params }: Props) {
                     <h3 className="text-sm font-semibold">{category}</h3>
                     <ul className="mt-3 space-y-2">
                       {names.map((n) => (
-                        <li key={n} className="flex items-start gap-2 text-sm">
+                        <li key={n.id} className="flex items-start gap-2 text-sm">
                           <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true" />
-                          {n}
+                          {n.name}
                         </li>
                       ))}
                     </ul>
@@ -254,6 +255,7 @@ export default async function VehiclePage({ params }: Props) {
                 </p>
                 <BookingForm
                   compact
+                  turnstileEnabled={isTurnstileEnabled()}
                   minDate={today}
                   maxDate={addDays(today, 60)}
                   initialVehicle={{

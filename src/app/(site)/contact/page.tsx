@@ -3,6 +3,7 @@ import { Clock, Mail, MapPin, Navigation, Phone } from "lucide-react";
 import { ContactForm } from "@/components/site/contact-form";
 import { PageHeader } from "@/components/site/section";
 import { SITE } from "@/lib/constants";
+import { isTurnstileEnabled } from "@/lib/security/turnstile";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -11,6 +12,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/contact" },
   openGraph: { title: "Contact NexDrive", url: "/contact" },
 };
+
+// Rendered per request so the Turnstile on/off decision reads the runtime secret,
+// not whatever was set when the image was built.
+export const dynamic = "force-dynamic";
 
 export default function ContactPage() {
   const { address } = SITE;
@@ -30,7 +35,7 @@ export default function ContactPage() {
           <h2 id="contact-form-heading" className="mb-6 text-xl font-semibold tracking-tight">
             Send us a message
           </h2>
-          <ContactForm />
+          <ContactForm turnstileEnabled={isTurnstileEnabled()} />
         </section>
 
         <aside aria-label="Contact details" className="space-y-6">

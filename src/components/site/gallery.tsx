@@ -21,7 +21,7 @@ export function Gallery({ images, alt, bodyType }: { images: string[]; alt: stri
         }}
       >
         <VehicleImage
-          key={images[index]}
+          key={`${index}-${images[index]}`}
           src={images[index]}
           alt={count > 1 ? `${alt}, photo ${index + 1} of ${count}` : alt}
           bodyType={bodyType}
@@ -59,7 +59,7 @@ export function Gallery({ images, alt, bodyType }: { images: string[]; alt: stri
       {count > 1 ? (
         <ul className="grid grid-cols-4 gap-3 sm:grid-cols-6">
           {images.map((src, i) => (
-            <li key={src}>
+            <li key={`${i}-${src}`}>
               <button
                 type="button"
                 onClick={() => setIndex(i)}

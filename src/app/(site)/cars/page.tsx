@@ -36,17 +36,17 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 function activeChips(f: VehicleFilters) {
-  const chips: { label: string; without: Partial<VehicleFilters> }[] = [];
-  if (f.q) chips.push({ label: `Search: ${f.q}`, without: { q: "" } });
-  if (f.make) chips.push({ label: f.make, without: { make: "" } });
-  if (f.body) chips.push({ label: f.body, without: { body: "" } });
-  if (f.condition) chips.push({ label: f.condition, without: { condition: "" } });
-  if (f.fuel) chips.push({ label: f.fuel, without: { fuel: "" } });
-  if (f.transmission) chips.push({ label: f.transmission, without: { transmission: "" } });
-  if (f.minPrice != null) chips.push({ label: `From ${formatCurrency(f.minPrice)}`, without: { minPrice: null } });
-  if (f.maxPrice != null) chips.push({ label: `Up to ${formatCurrency(f.maxPrice)}`, without: { maxPrice: null } });
-  if (f.minYear != null) chips.push({ label: `${f.minYear} or newer`, without: { minYear: null } });
-  if (f.maxYear != null) chips.push({ label: `${f.maxYear} or older`, without: { maxYear: null } });
+  const chips: { id: string; label: string; without: Partial<VehicleFilters> }[] = [];
+  if (f.q) chips.push({ id: "q", label: `Search: ${f.q}`, without: { q: "" } });
+  if (f.make) chips.push({ id: "make", label: f.make, without: { make: "" } });
+  if (f.body) chips.push({ id: "body", label: f.body, without: { body: "" } });
+  if (f.condition) chips.push({ id: "condition", label: f.condition, without: { condition: "" } });
+  if (f.fuel) chips.push({ id: "fuel", label: f.fuel, without: { fuel: "" } });
+  if (f.transmission) chips.push({ id: "transmission", label: f.transmission, without: { transmission: "" } });
+  if (f.minPrice != null) chips.push({ id: "minPrice", label: `From ${formatCurrency(f.minPrice)}`, without: { minPrice: null } });
+  if (f.maxPrice != null) chips.push({ id: "maxPrice", label: `Up to ${formatCurrency(f.maxPrice)}`, without: { maxPrice: null } });
+  if (f.minYear != null) chips.push({ id: "minYear", label: `${f.minYear} or newer`, without: { minYear: null } });
+  if (f.maxYear != null) chips.push({ id: "maxYear", label: `${f.maxYear} or older`, without: { maxYear: null } });
   return chips;
 }
 
@@ -87,7 +87,7 @@ export default async function InventoryPage({ searchParams }: Props) {
           {chips.length > 0 ? (
             <ul aria-label="Active filters" className="flex flex-wrap gap-2">
               {chips.map((chip) => (
-                <li key={chip.label}>
+                <li key={chip.id}>
                   <Link
                     href={`/cars${filtersToQuery({ ...filters, ...chip.without, page: 1 })}`}
                     scroll={false}

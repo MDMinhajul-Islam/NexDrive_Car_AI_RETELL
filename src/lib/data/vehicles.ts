@@ -162,7 +162,7 @@ export async function listVehicles(filters: VehicleFilters): Promise<VehicleList
 }
 
 export type VehicleDetail = VehicleWithImages & {
-  features: { name: string; category: string }[];
+  features: { id: string; name: string; category: string }[];
 };
 
 export async function getVehicle(vehicleId: string): Promise<VehicleDetail | null> {
@@ -170,7 +170,7 @@ export async function getVehicle(vehicleId: string): Promise<VehicleDetail | nul
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("vehicles")
-    .select("*, vehicle_features(features(name, category))")
+    .select("*, vehicle_features(features(feature_id, name, category))")
     .eq("vehicle_id", vehicleId)
     .maybeSingle();
   if (error) {
@@ -182,7 +182,8 @@ export async function getVehicle(vehicleId: string): Promise<VehicleDetail | nul
   const { vehicle_features, ...vehicle } = data;
   const features = (vehicle_features ?? [])
     .map((vf) => vf.features)
-    .filter((f): f is { name: string; category: string } => Boolean(f))
+    .filter((f): f is { feature_id: string; name: string; category: string } => Boolean(f))
+    .map((f) => ({ id: f.feature_id, name: f.name, category: f.category }))
     .sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
   const [withImg] = await withImages([vehicle]);
   return { ...withImg, features };

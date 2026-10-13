@@ -121,7 +121,7 @@ export default async function AdminDashboardPage({ searchParams }: Props) {
         { length: Math.max(...data.byHour.map((h) => h.hour)) - Math.min(...data.byHour.map((h) => h.hour)) + 1 },
         (_, i) => {
           const hour = Math.min(...data.byHour.map((h) => h.hour)) + i;
-          return { label: hourLabel(hour), value: data.byHour.find((h) => h.hour === hour)?.bookings ?? 0 };
+          return { id: `hour-${hour}`, label: hourLabel(hour), value: data.byHour.find((h) => h.hour === hour)?.bookings ?? 0 };
         },
       )
     : [];
@@ -199,9 +199,16 @@ export default async function AdminDashboardPage({ searchParams }: Props) {
           <StatusDonut data={data.byStatus} />
         </Card>
 
-        <Card title="Most booked cars" description="Vehicles with the most bookings in the selected range" className="xl:col-span-2">
+        <Card title="Most booked cars" description="Vehicles with the most bookings in the selected range. Select a name to open it in Cars." className="xl:col-span-2">
           <RankedBars
-            data={data.topVehicles.map((v) => ({ label: v.name, value: v.bookings }))}
+            // Keyed by vehicle_id: two different cars can both be a "2016 Toyota RAV4".
+            data={data.topVehicles.map((v) => ({
+              id: v.vehicleId,
+              label: v.name,
+              sublabel: v.stockNumber,
+              value: v.bookings,
+              href: `/admin/cars?q=${v.vehicleId}`,
+            }))}
             unit="booking"
             labelHeader="Vehicle"
             emptyText="No bookings in this period."
@@ -227,7 +234,11 @@ export default async function AdminDashboardPage({ searchParams }: Props) {
             data={
               timeView === "hour"
                 ? hours
-                : data.byWeekday.map((d) => ({ label: WEEKDAYS[d.weekday] ?? String(d.weekday), value: d.bookings }))
+                : data.byWeekday.map((d) => ({
+                    id: `weekday-${d.weekday}`,
+                    label: WEEKDAYS[d.weekday] ?? String(d.weekday),
+                    value: d.bookings,
+                  }))
             }
             unit="booking"
             labelHeader={timeView === "hour" ? "Hour" : "Weekday"}
@@ -252,7 +263,12 @@ export default async function AdminDashboardPage({ searchParams }: Props) {
           }
         >
           <RankedBars
-            data={inventory.map((r) => ({ label: r.label, value: r.vehicles }))}
+            data={inventory.map((r) => ({
+              id: `${inventoryView}-${r.label}`,
+              label: r.label,
+              value: r.vehicles,
+              href: `/admin/cars?${inventoryView === "body" ? `body=${encodeURIComponent(r.label)}` : `q=${encodeURIComponent(r.label)}`}`,
+            }))}
             unit="vehicle"
             labelHeader={inventoryView === "body" ? "Body type" : "Brand"}
             emptyText="No vehicles in stock."

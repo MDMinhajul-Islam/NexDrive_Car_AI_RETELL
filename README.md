@@ -27,7 +27,7 @@ Rules built in:
 
 - Node.js 22 or newer and npm
 - A Supabase project (this one already exists)
-- A Cloudflare Turnstile widget (free) for spam protection
+- Optional: a Cloudflare Turnstile widget (free) for spam protection
 - Docker, only if you deploy with the Dockerfile
 
 ## Local setup
@@ -63,7 +63,7 @@ Rules that matter:
 - `NEXT_PUBLIC_*` values are inlined into the JavaScript at **build** time. Changing them needs a rebuild.
 - The two server secrets are read at **runtime** and never reach the browser.
 - The Supabase **service role key is not used anywhere**. Do not add it.
-- In production, a missing `TURNSTILE_SECRET_KEY` makes both forms reject every submission. In development it is skipped.
+- Turnstile is optional. It is on only when both Turnstile keys are set. With `TURNSTILE_SECRET_KEY` empty the check is skipped and the widget is hidden.
 
 ## Database setup
 
@@ -114,8 +114,8 @@ Everyone else is redirected away from `/admin`, including signed-in users withou
 
 ## Spam protection
 
-- **Cloudflare Turnstile** on the booking and contact forms. The token is verified in the Server Action before any database call.
-- **Per-IP rate limits** on Server Actions: 5 bookings and 5 contact messages per 10 minutes, plus looser limits on slot lookups, vehicle search and admin sign-in.
+- **Cloudflare Turnstile** on the booking and contact forms, when enabled. The token is verified in the Server Action before any database call. It is optional: leave `TURNSTILE_SECRET_KEY` empty to turn it off.
+- **Per-IP rate limits** on Server Actions, always on: 5 bookings and 5 contact messages per 10 minutes, plus looser limits on slot lookups, vehicle search and admin sign-in.
 - The rate limiter is in memory. It suits one container. With several replicas, move it to a shared store such as Redis.
 - A hidden honeypot field on both forms.
 

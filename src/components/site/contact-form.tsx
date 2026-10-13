@@ -10,10 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { fieldA11y, FormField } from "@/components/site/form-field";
-import { TURNSTILE_ENABLED, TurnstileField, type TurnstileHandle } from "@/components/site/turnstile-field";
+import { TurnstileField, type TurnstileHandle } from "@/components/site/turnstile-field";
 import { contactSchema, type ContactInput } from "@/lib/validations/contact";
 
-export function ContactForm() {
+export function ContactForm({ turnstileEnabled }: { turnstileEnabled: boolean }) {
   const [sent, setSent] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const submitting = useRef(false);
@@ -32,7 +32,7 @@ export function ContactForm() {
 
   const onSubmit = handleSubmit(async (values) => {
     if (submitting.current) return;
-    if (TURNSTILE_ENABLED && !values.turnstileToken) {
+    if (turnstileEnabled && !values.turnstileToken) {
       setError("turnstileToken", { message: "Please complete the verification check." });
       return;
     }
@@ -117,6 +117,7 @@ export function ContactForm() {
 
       <input type="hidden" {...register("turnstileToken")} />
       <TurnstileField
+        enabled={turnstileEnabled}
         ref={turnstile}
         error={errors.turnstileToken?.message}
         onToken={(token) => setValue("turnstileToken", token, { shouldValidate: Boolean(token) })}

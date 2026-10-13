@@ -5,20 +5,18 @@ import { forwardRef } from "react";
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
-/** True when a site key was provided at build time. Without one the widget is not rendered. */
-export const TURNSTILE_ENABLED = Boolean(SITE_KEY);
-
 export type TurnstileHandle = TurnstileInstance;
 
 /**
- * Cloudflare Turnstile widget. Tokens are single use, so call `ref.current?.reset()`
- * after every failed submit.
+ * Cloudflare Turnstile widget. Rendered only when `enabled` is true; the server decides
+ * that with isTurnstileEnabled() and passes it down, so the widget and the server-side
+ * check always agree. Tokens are single use: call `ref.current?.reset()` after a failed submit.
  */
 export const TurnstileField = forwardRef<
   TurnstileInstance,
-  { onToken: (token: string) => void; error?: string }
->(function TurnstileField({ onToken, error }, ref) {
-  if (!SITE_KEY) return null;
+  { enabled: boolean; onToken: (token: string) => void; error?: string }
+>(function TurnstileField({ enabled, onToken, error }, ref) {
+  if (!enabled || !SITE_KEY) return null;
   return (
     <div className="space-y-2">
       <Turnstile

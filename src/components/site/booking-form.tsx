@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { fieldA11y, FormField } from "@/components/site/form-field";
-import { TURNSTILE_ENABLED, TurnstileField, type TurnstileHandle } from "@/components/site/turnstile-field";
+import { TurnstileField, type TurnstileHandle } from "@/components/site/turnstile-field";
 import { SITE } from "@/lib/constants";
 import { formatCurrency, formatDate, formatTime } from "@/lib/format";
 import { bookingSchema, type BookingInput } from "@/lib/validations/booking";
@@ -37,6 +37,7 @@ export function BookingForm({
   minDate,
   maxDate,
   compact = false,
+  turnstileEnabled,
 }: {
   /** Preselected when the visitor arrives from a vehicle page. */
   initialVehicle?: VehicleOption | null;
@@ -44,6 +45,8 @@ export function BookingForm({
   minDate: string;
   maxDate: string;
   compact?: boolean;
+  /** From isTurnstileEnabled() on the server. */
+  turnstileEnabled: boolean;
 }) {
   const [vehicle, setVehicle] = useState<VehicleOption | null>(initialVehicle ?? null);
   const [term, setTerm] = useState("");
@@ -130,7 +133,7 @@ export function BookingForm({
   const onSubmit = handleSubmit(async (values) => {
     // Guard against double clicks and Enter-key repeats.
     if (submitting.current) return;
-    if (TURNSTILE_ENABLED && !values.turnstileToken) {
+    if (turnstileEnabled && !values.turnstileToken) {
       setError("turnstileToken", { message: "Please complete the verification check." });
       return;
     }
@@ -419,6 +422,7 @@ export function BookingForm({
 
       <input type="hidden" {...register("turnstileToken")} />
       <TurnstileField
+        enabled={turnstileEnabled}
         ref={turnstile}
         error={errors.turnstileToken?.message}
         onToken={(token) => setValue("turnstileToken", token, { shouldValidate: Boolean(token) })}

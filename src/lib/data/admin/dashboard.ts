@@ -61,7 +61,8 @@ export type DashboardData = {
   kpis: Kpis | null;
   overTime: { day: string; bookings: number }[];
   byStatus: { status: string; bookings: number }[];
-  topVehicles: { vehicleId: string; name: string; bookings: number }[];
+  /** One entry per vehicle_id. Two vehicles can share a name, so the ID is the identity. */
+  topVehicles: { vehicleId: string; name: string; stockNumber: string; bookings: number }[];
   byWeekday: { weekday: number; bookings: number }[];
   byHour: { hour: number; bookings: number }[];
   inventoryByMake: { label: string; vehicles: number; totalValue: number }[];
@@ -107,6 +108,20 @@ export async function getDashboardData(range: DashboardRange): Promise<Dashboard
   check("Inventory by brand", byMake);
   check("Inventory by body type", byBody);
 
+  // dashboard_top_vehicles returns vehicle_id, a display name and the count. Names are not
+  // unique (two 2016 Toyota RAV4s are two rows), so look up each stock number to tell
+  // same-name vehicles apart. One small query for at most 8 IDs.
+  const topIds = (top.data ?? []).map((r) => r.vehicle_id);
+  const stock = new Map<string, string>();
+  if (topIds.length > 0) {
+    const { data: rows, error } = await supabase
+      .from("vehicles")
+      .select("vehicle_id, stock_number")
+      .in("vehicle_id", topIds);
+    if (error) console.error("[admin] stock number lookup failed:", error.message);
+    for (const row of rows ?? []) stock.set(row.vehicle_id, row.stock_number);
+  }
+
   const k = kpis.data && typeof kpis.data === "object" && !Array.isArray(kpis.data) ? kpis.data : null;
 
   return {
@@ -129,7 +144,13 @@ export async function getDashboardData(range: DashboardRange): Promise<Dashboard
       : null,
     overTime: (overTime.data ?? []).map((r) => ({ day: r.day, bookings: n(r.bookings) })),
     byStatus: (byStatus.data ?? []).map((r) => ({ status: r.status, bookings: n(r.bookings) })),
-    topVehicles: (top.data ?? []).map((r) => ({ vehicleId: r.vehicle_id, name: r.vehicle_name, bookings: n(r.bookings) })),
+    topVehicles: (top.data ?? []).map((r) => ({
+      vehicleId: r.vehicle_id,
+      name: r.vehicle_name,
+      // Fall back to the vehicle ID so the label is still unique if the lookup failed.
+      stockNumber: stock.get(r.vehicle_id) ?? r.vehicle_id,
+      bookings: n(r.bookings),
+    })),
     byWeekday: (weekday.data ?? []).map((r) => ({ weekday: n(r.weekday), bookings: n(r.bookings) })),
     byHour: (hour.data ?? []).map((r) => ({ hour: n(r.hour), bookings: n(r.bookings) })),
     inventoryByMake: (byMake.data ?? []).map((r) => ({ label: r.label, vehicles: n(r.vehicles), totalValue: n(r.total_value) })),

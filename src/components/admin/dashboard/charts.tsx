@@ -1,6 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
+import Link from "next/link";
+import { useMemo, type ReactNode } from "react";
 import {
   Bar,
   BarChart,
@@ -62,8 +63,24 @@ function ChartTooltip({
   );
 }
 
+/**
+ * One mark in a bar or column chart.
+ * `id` is the stable identity (a vehicle_id, "weekday-3", a brand): it is the React key
+ * and the chart's category key. `label` is display text and may repeat across rows.
+ */
+export type ChartDatum = {
+  id: string;
+  label: string;
+  /** Second line that tells same-label rows apart, for example a stock number. */
+  sublabel?: string;
+  value: number;
+  href?: string;
+};
+
+export type ChartTableRow = { id: string; label: string; sublabel?: string; value: string; href?: string };
+
 /** Collapsible data table under each chart: the non-visual and low-contrast fallback. */
-export function ChartTable({ headers, rows }: { headers: [string, string]; rows: [string, string][] }) {
+export function ChartTable({ headers, rows }: { headers: [string, string]; rows: ChartTableRow[] }) {
   return (
     <details className="mt-3 text-sm">
       <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground">
@@ -82,16 +99,67 @@ export function ChartTable({ headers, rows }: { headers: [string, string]; rows:
             </tr>
           </thead>
           <tbody className="divide-y">
-            {rows.map(([a, b]) => (
-              <tr key={a}>
-                <td className="px-3 py-1.5">{a}</td>
-                <td className="px-3 py-1.5 text-right tabular-nums">{b}</td>
-              </tr>
-            ))}
+            {rows.map((row) => {
+              const text = row.sublabel ? `${row.label} · ${row.sublabel}` : row.label;
+              return (
+                <tr key={row.id}>
+                  <td className="px-3 py-1.5">
+                    {row.href ? (
+                      <Link href={row.href} className="underline-offset-4 hover:underline">
+                        {text}
+                      </Link>
+                    ) : (
+                      text
+                    )}
+                  </td>
+                  <td className="px-3 py-1.5 text-right tabular-nums">{row.value}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
     </details>
+  );
+}
+
+const toTableRows = (data: ChartDatum[]): ChartTableRow[] =>
+  data.map((d) => ({ id: d.id, label: d.label, sublabel: d.sublabel, href: d.href, value: formatNumber(d.value) }));
+
+const truncate = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
+
+/** Y-axis tick for ranked bars: label, optional second line, optional link to the record. */
+function CategoryTick({
+  x = 0,
+  y = 0,
+  payload,
+  byId,
+}: {
+  x?: number;
+  y?: number;
+  payload?: { value?: string };
+  byId: Map<string, ChartDatum>;
+}) {
+  const datum = byId.get(String(payload?.value ?? ""));
+  if (!datum) return null;
+  const text = (
+    <text x={x - 8} y={y} textAnchor="end" fontSize={12}>
+      <tspan x={x - 8} dy={datum.sublabel ? "-0.25em" : "0.32em"} fill="#44403c">
+        {truncate(datum.label, 22)}
+      </tspan>
+      {datum.sublabel ? (
+        <tspan x={x - 8} dy="1.25em" fill="#78716c" fontSize={11}>
+          {datum.sublabel}
+        </tspan>
+      ) : null}
+    </text>
+  );
+  return datum.href ? (
+    <a href={datum.href} aria-label={`${datum.label}${datum.sublabel ? `, ${datum.sublabel}` : ""}: open in Cars`}>
+      {text}
+    </a>
+  ) : (
+    text
   );
 }
 
@@ -132,7 +200,10 @@ export function BookingsLineChart({ data }: { data: { day: string; bookings: num
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <ChartTable headers={["Day", "Bookings"]} rows={data.map((d) => [shortDate(d.day), formatNumber(d.bookings)])} />
+      <ChartTable
+        headers={["Day", "Bookings"]}
+        rows={data.map((d) => ({ id: d.day, label: shortDate(d.day), value: formatNumber(d.bookings) }))}
+      />
     </>
   );
 }
@@ -187,6 +258,12 @@ export function StatusDonut({ data }: { data: { status: string; bookings: number
   );
 }
 
+const tooltipTitle = (entry: TooltipEntry) => {
+  const label = String(entry.payload?.label ?? "");
+  const sub = entry.payload?.sublabel;
+  return typeof sub === "string" && sub ? `${label} · ${sub}` : label;
+};
+
 /** Horizontal bars for ranked categories with long labels. */
 export function RankedBars({
   data,
@@ -194,13 +271,15 @@ export function RankedBars({
   labelHeader,
   emptyText,
 }: {
-  data: { label: string; value: number }[];
+  data: ChartDatum[];
   unit: string;
   labelHeader: string;
   emptyText: string;
 }) {
+  const byId = useMemo(() => new Map(data.map((d) => [d.id, d])), [data]);
   if (data.length === 0 || data.every((d) => d.value === 0)) return <Empty>{emptyText}</Empty>;
-  const height = Math.max(160, data.length * 34 + 24);
+  const twoLine = data.some((d) => d.sublabel);
+  const height = Math.max(160, data.length * (twoLine ? 44 : 34) + 24);
   return (
     <>
       <div style={{ height }} role="img" aria-label={`Bar chart of ${unit}s by ${labelHeader.toLowerCase()}. Use the table below for exact values.`}>
@@ -208,16 +287,17 @@ export function RankedBars({
           <BarChart data={data} layout="vertical" margin={{ top: 0, right: 36, bottom: 0, left: 0 }} barCategoryGap={8}>
             <CartesianGrid stroke={GRID} horizontal={false} />
             <XAxis type="number" allowDecimals={false} tick={AXIS} tickLine={false} axisLine={false} />
+            {/* The category axis is keyed by id, never by label: labels can repeat. */}
             <YAxis
               type="category"
-              dataKey="label"
-              tick={AXIS}
+              dataKey="id"
+              tick={<CategoryTick byId={byId} />}
               tickLine={false}
               axisLine={{ stroke: GRID }}
               width={150}
-              tickFormatter={(v: string) => (v.length > 22 ? `${v.slice(0, 21)}…` : v)}
+              interval={0}
             />
-            <Tooltip cursor={{ fill: "#f5f5f4" }} content={<ChartTooltip unit={unit} />} />
+            <Tooltip cursor={{ fill: "#f5f5f4" }} content={<ChartTooltip unit={unit} title={tooltipTitle} />} />
             <Bar
               dataKey="value"
               fill={SERIES}
@@ -229,7 +309,7 @@ export function RankedBars({
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <ChartTable headers={[labelHeader, `${unit[0].toUpperCase()}${unit.slice(1)}s`]} rows={data.map((d) => [d.label, formatNumber(d.value)])} />
+      <ChartTable headers={[labelHeader, `${unit[0].toUpperCase()}${unit.slice(1)}s`]} rows={toTableRows(data)} />
     </>
   );
 }
@@ -241,11 +321,12 @@ export function ColumnBars({
   labelHeader,
   emptyText,
 }: {
-  data: { label: string; value: number }[];
+  data: ChartDatum[];
   unit: string;
   labelHeader: string;
   emptyText: string;
 }) {
+  const byId = useMemo(() => new Map(data.map((d) => [d.id, d])), [data]);
   if (data.length === 0 || data.every((d) => d.value === 0)) return <Empty>{emptyText}</Empty>;
   return (
     <>
@@ -253,14 +334,22 @@ export function ColumnBars({
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -16 }} barCategoryGap="20%">
             <CartesianGrid stroke={GRID} vertical={false} />
-            <XAxis dataKey="label" tick={AXIS} tickLine={false} axisLine={{ stroke: GRID }} interval="preserveStartEnd" minTickGap={8} />
+            <XAxis
+              dataKey="id"
+              tickFormatter={(id: string) => byId.get(id)?.label ?? ""}
+              tick={AXIS}
+              tickLine={false}
+              axisLine={{ stroke: GRID }}
+              interval="preserveStartEnd"
+              minTickGap={8}
+            />
             <YAxis allowDecimals={false} tick={AXIS} tickLine={false} axisLine={false} width={48} />
-            <Tooltip cursor={{ fill: "#f5f5f4" }} content={<ChartTooltip unit={unit} />} />
+            <Tooltip cursor={{ fill: "#f5f5f4" }} content={<ChartTooltip unit={unit} title={tooltipTitle} />} />
             <Bar dataKey="value" fill={SERIES} maxBarSize={24} radius={[4, 4, 0, 0]} isAnimationActive={false} />
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <ChartTable headers={[labelHeader, `${unit[0].toUpperCase()}${unit.slice(1)}s`]} rows={data.map((d) => [d.label, formatNumber(d.value)])} />
+      <ChartTable headers={[labelHeader, `${unit[0].toUpperCase()}${unit.slice(1)}s`]} rows={toTableRows(data)} />
     </>
   );
 }
